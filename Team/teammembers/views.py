@@ -18,7 +18,6 @@ class TeamMemberListView(APIView):
 	def post(self, request):
 		team_member = request.data.get('team_member')
 		serializer = TeamMemberSerializer(data=team_member)
-		print(serializer)
 		if serializer.is_valid(raise_exception=True):
 			team_member_saved = serializer.save()
 		return JsonResponse(TeamMemberSerializer(team_member_saved).data)
