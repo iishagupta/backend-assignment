@@ -7,6 +7,7 @@ from rest_framework import serializers
 from .models import TeamMember
 from collections import OrderedDict
 
+# Stack Overlflow
 class RoleChoicesField(serializers.Field): 
     def __init__(self, choices, **kwargs):
         self._choices = OrderedDict(choices)
