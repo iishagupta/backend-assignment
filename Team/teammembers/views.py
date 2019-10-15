@@ -35,9 +35,3 @@ class TeamMemberListView(APIView):
 		team_member.delete()
 		return JsonResponse({"result": []})
 
-
-
-
-
-
-# Create your views here.
