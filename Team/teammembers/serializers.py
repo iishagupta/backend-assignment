@@ -6,6 +6,7 @@
 from rest_framework import serializers
 from .models import TeamMember
 from collections import OrderedDict
+import re
 
 class RoleChoicesField(serializers.Field): 
     def __init__(self, choices, **kwargs):
@@ -29,13 +30,20 @@ class TeamMemberSerializer(serializers.Serializer):
 	lastName = serializers.CharField(max_length=200)
 	email = serializers.CharField(max_length=200)
 	mobile = serializers.CharField(max_length=14)
-	ROLE_CHOICES = (
-		(1, ("Admin")),
-		(2, ("Regular")),
-	)
 	role =  RoleChoicesField(TeamMember.ROLE_CHOICES)
 
 	def create(self, validated_data):
+		mobile = validated_data.get('mobile')
+		email = validated_data.get('email')
+		# 1) Begins with 0 or 91 
+		# 2) Then contains 7 or 8 or 9. 
+		# 3) Then contains 9 digits 
+		pattern = re.compile("(0/91)?[7-9][0-9]{9}")
+		if not pattern.match(mobile):
+			raise serializers.ValidationError('Invalid Phone Number')
+		epattern = re.compile("^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$")
+		if not epattern.match(email):
+			raise serializers.ValidationError('Invalid Email')
 		return TeamMember.objects.create(**validated_data)
 
 	def update(self, instance, validated_data):

@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import TeamMemberSerializer
 from django.shortcuts import get_object_or_404
+from rest_framework.settings import api_settings
 
 import json
 
@@ -10,10 +11,15 @@ from .models import TeamMember
 
 
 class TeamMemberListView(APIView):
+	queryset = TeamMember.objects.all()
+	serializer_class = TeamMemberSerializer
+	pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
+
 	def get(self, request):
-		team_member_list = TeamMember.objects.all()
-		serializer = TeamMemberSerializer(team_member_list, many=True)
-		return JsonResponse({'team_members': serializer.data})
+		page = self.paginate_queryset(self.queryset)
+	 	if page is not None:
+	        serializer = self.serializer_class(page, many=True)
+	        return self.get_paginated_response(serializer.data)
 
 	def post(self, request):
 		team_member = request.data.get('team_member')
@@ -36,9 +42,35 @@ class TeamMemberListView(APIView):
 		team_member.delete()
 		return JsonResponse({"result": []})
 
+	@property
+	def paginator(self):
+	    """
+	    The paginator instance associated with the view, or `None`.
+	    """
+	    if not hasattr(self, '_paginator'):
+	        if self.pagination_class is None:
+	            self._paginator = None
+	        else:
+	            self._paginator = self.pagination_class()
+
+	def paginate_queryset(self, queryset):
+	     """
+	     Return a single page of results, or `None` if pagination is disabled.
+	     """
+	     if self.paginator is None:
+	         return None
+	     return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+	def get_paginated_response(self, data):
+	     """
+	     Return a paginated style `Response` object for the given output data.
+	     """
+	     assert self.paginator is not None
+	     return self.paginator.get_paginated_response(data)
 
 
 
 
 
-# Create your views here.
+
+	# Create your views here.
