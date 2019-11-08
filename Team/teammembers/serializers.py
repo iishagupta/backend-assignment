@@ -51,7 +51,7 @@ class TeamMemberSerializer(serializers.Serializer):
 		return TeamMember.objects.create(**validated_data)
 
 	def update(self, instance, validated_data):
-		self.validate_data(validate_data)
+		self.validate_data(validated_data)
 		instance.firstName = validated_data.get('firstName', instance.firstName)
 		instance.lastName = validated_data.get('lastName', instance.lastName)
 		instance.email = validated_data.get('email', instance.email)
