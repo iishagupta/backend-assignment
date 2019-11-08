@@ -39,7 +39,7 @@ class TeamMemberListView(APIView):
 	def delete(self, request, pk):
 		team_member = get_object_or_404(TeamMember.objects.all(), id=pk)
 		team_member.delete()
-		return JsonResponse({"result": []})
+		return JsonResponse({"team_member": []})
 
 	@property
 	def paginator(self):
