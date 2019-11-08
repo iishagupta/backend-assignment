@@ -33,7 +33,7 @@ class TeamMemberSerializer(serializers.Serializer):
 	mobile = serializers.CharField(max_length=14)
 	role =  RoleChoicesField(TeamMember.ROLE_CHOICES)
 
-	def create(self, validated_data):
+	def validate_data(self, validated_data):
 		mobile = validated_data.get('mobile')
 		email = validated_data.get('email')
 		# 1) Begins with 0 or 91 
@@ -45,9 +45,13 @@ class TeamMemberSerializer(serializers.Serializer):
 		epattern = re.compile("^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$")
 		if not epattern.match(email):
 			raise serializers.ValidationError('Invalid Email')
+
+	def create(self, validated_data):
+		self.validate_data(validated_data)
 		return TeamMember.objects.create(**validated_data)
 
 	def update(self, instance, validated_data):
+		self.validate_data(validate_data)
 		instance.firstName = validated_data.get('firstName', instance.firstName)
 		instance.lastName = validated_data.get('lastName', instance.lastName)
 		instance.email = validated_data.get('email', instance.email)
